@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Articles</title>
+</head>
+
+<body>
+
+  <h1>📘 Gestion des Articles</h1>
+
+  <!-- AJOUT -->
+  <h2>Ajouter un article</h2>
+
+  <input id="titre" placeholder="Titre"><br><br>
+  <input id="contenu" placeholder="Contenu"><br><br>
+  <input id="auteur" placeholder="Auteur"><br><br>
+  <input id="date" placeholder="Date (YYYY-MM-DD)"><br><br>
+  <input id="categorie" placeholder="Categorie"><br><br>
+  <input id="tags" placeholder="Tags"><br><br>
+
+  <button onclick="ajouterArticle()">Ajouter</button>
+
+  <hr>
+
+  <!-- MODIFIER -->
+  <h2>Modifier un article</h2>
+
+  <input id="idUpdate" placeholder="ID"><br><br>
+  <input id="titreUpdate" placeholder="Nouveau titre"><br><br>
+
+  <button onclick="modifierArticle()">Modifier</button>
+
+  <hr>
+
+  <!-- SUPPRIMER -->
+  <h2>Supprimer un article</h2>
+
+  <input id="idDelete" placeholder="ID"><br><br>
+
+  <button onclick="supprimerArticle()">Supprimer</button>
+
+  <hr>
+
+  <!-- RECHERCHE -->
+  <h2>Rechercher un article</h2>
+
+  <input id="search" placeholder="Titre à rechercher"><br><br>
+
+  <button onclick="rechercher()">Rechercher</button>
+
+  <hr>
+
+  <!-- AFFICHER -->
+  <h2>Liste des articles</h2>
+
+  <button onclick="chargerArticles()">Afficher</button>
+
+  <ul id="liste"></ul>
+
+  <script>
+
+    // 🔹 Ajouter
+    function ajouterArticle() {
+      fetch("http://localhost:3000/api/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          titre: document.getElementById("titre").value,
+          contenu: document.getElementById("contenu").value,
+          auteur: document.getElementById("auteur").value,
+          date: document.getElementById("date").value,
+          categorie: document.getElementById("categorie").value,
+          tags: document.getElementById("tags").value
+        })
+      })
+      .then(res => res.json())
+      .then(() => {
+        alert("Article ajouté !");
+        chargerArticles();
+      });
+    }
+
+    // 🔹 Afficher
+    function chargerArticles() {
+      fetch("http://localhost:3000/api/articles")
+        .then(res => res.json())
+        .then(data => {
+          let liste = document.getElementById("liste");
+          liste.innerHTML = "";
+
+          data.forEach(article => {
+            let li = document.createElement("li");
+            li.textContent = article.id + " - " + article.titre + " (" + article.auteur + ")";
+            liste.appendChild(li);
+          });
+        });
+    }
+
+    // 🔹 Supprimer
+    function supprimerArticle() {
+      let id = document.getElementById("idDelete").value;
+
+      fetch("http://localhost:3000/api/articles/" + id, {
+        method: "DELETE"
+      })
+      .then(() => {
+        alert("Article supprimé !");
+        chargerArticles();
+      });
+    }
+
+    // 🔹 Modifier
+    function modifierArticle() {
+      let id = document.getElementById("idUpdate").value;
+
+      fetch("http://localhost:3000/api/articles/" + id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          titre: document.getElementById("titreUpdate").value
+        })
+      })
+      .then(() => {
+        alert("Article modifié !");
+        chargerArticles();
+      });
+    }
+
+    // 🔹 Rechercher
+    function rechercher() {
+      let mot = document.getElementById("search").value;
+
+      fetch("http://localhost:3000/api/articles/search?titre=" + mot)
+        .then(res => res.json())
+        .then(data => {
+          let liste = document.getElementById("liste");
+          liste.innerHTML = "";
+
+          data.forEach(article => {
+            let li = document.createElement("li");
+            li.textContent = article.titre + " - " + article.auteur;
+            liste.appendChild(li);
+          });
+        });
+    }
+
+  </script>
+
+</body>
+</html>

@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+app.use(express.json());
+app.use('/app',express.static('public'));
 const mysql = require('mysql2');
 
 // ================= DATABASE =================
@@ -28,7 +30,7 @@ const options = {
       description: "API complète de gestion des articles"
     }
   },
-  apis: ["./endex.js"]
+  apis: ["./index.js"]
 };
 
 const swaggerSpec = swaggerJsdoc(options);
